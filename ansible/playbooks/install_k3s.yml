@@ -1,0 +1,17 @@
+---
+- name: Install K3s on masters (server)
+  hosts: k3s_masters
+  become: true
+  gather_facts: true
+  roles:
+    - role: k3s_common
+    - role: k3s_server
+
+- name: Install K3s on workers (agent)
+  hosts: k3s_workers
+  become: true
+  gather_facts: true
+  roles:
+    - role: k3s_common
+    - role: k3s_agent
+

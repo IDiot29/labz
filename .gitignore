@@ -1,0 +1,64 @@
+# ----- Operating system cruft -----
+.DS_Store
+Thumbs.db
+
+# ----- Python / Ansible build artifacts -----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+.env/
+.envrc
+
+# ----- IDE / editor files -----
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# ----- Secrets & credentials -----
+password.txt
+ansible/password.txt
+*.vault_pass
+*.agekey
+*.pem
+*.key
+*.pfx
+*.p12
+*.der
+*.crt
+*.kubeconfig
+*.kube
+*.cert
+*.csr
+
+# ----- Environment-specific data -----
+ips.txt
+ansible/inventory.ini
+ansible/inventories/*/hosts.ini
+ansible/inventories/*/group_vars/
+copy_keys.sh
+AGENTS.md
+CLAUDE.md
+
+# Local override files
+*.local.yml
+*.override.yml
+
+# SSH known hosts cache created during automation runs
+known_hosts
+
+# Log files & dumps
+*.log
+logs/
+*.tmp
+*.bak
+
+# Terraform / deployment state (if generated in this tree)
+*.tfstate
+*.tfstate.backup
+.terraform/

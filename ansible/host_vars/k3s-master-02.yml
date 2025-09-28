@@ -1,0 +1,3 @@
+---
+k3s_config_template: "k3s-master-02.yaml.j2"
+

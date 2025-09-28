@@ -1,0 +1,20 @@
+---
+# Global defaults for K3s
+
+# K3s version tag
+k3s_version: "v1.33.4+k3s1"
+
+# K3s token (secret) — set via Vault:
+# Create ansible/group_vars/all/vault.yml with `vault_k3s_token` and encrypt it
+k3s_token: "{{ vault_k3s_token | default('') }}"
+
+# Default server URL (used only if template expects it)
+k3s_server_url: "https://10.10.0.26:6443"
+
+# Binary and script locations
+k3s_binary_path: "/usr/local/bin/k3s"
+k3s_install_script_path: "/root/get.k3s.sh"
+
+# Whether to skip k3s download in the installer (we place the binary ourselves)
+k3s_install_skip_download: true
+

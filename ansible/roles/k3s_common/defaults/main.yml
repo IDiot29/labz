@@ -1,0 +1,8 @@
+---
+# Defaults for k3s_common
+k3s_version: "v1.33.4+k3s1"
+k3s_binary_path: "/usr/local/bin/k3s"
+k3s_install_script_path: "/root/get.k3s.sh"
+k3s_install_script_url: "https://get.k3s.io"
+k3s_install_skip_download: true
+

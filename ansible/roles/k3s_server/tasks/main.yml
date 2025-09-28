@@ -1,0 +1,25 @@
+---
+- name: Render K3s server config.yaml from host-specific template
+  ansible.builtin.template:
+    src: "{{ k3s_config_template }}"
+    dest: "/etc/rancher/k3s/config.yaml"
+    mode: '0644'
+  notify: Restart k3s server
+
+- name: Check if k3s server service exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/k3s.service
+  register: k3s_server_service
+
+- name: Install k3s server
+  ansible.builtin.command: sh {{ k3s_install_script_path }} server
+  environment:
+    INSTALL_K3S_SKIP_DOWNLOAD: "{{ 'true' if k3s_install_skip_download else 'false' }}"
+  when: not k3s_server_service.stat.exists
+
+- name: Enable and start k3s server
+  ansible.builtin.systemd:
+    name: k3s
+    enabled: true
+    state: started
+

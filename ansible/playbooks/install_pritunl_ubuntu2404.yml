@@ -1,0 +1,126 @@
+---
+- name: Install Pritunl VPN on Ubuntu 24.04 with MongoDB 8.0
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Assert Ubuntu 24.04 noble
+      assert:
+        that:
+          - ansible_facts['os_family'] == 'Debian'
+          - ansible_facts['distribution'] == 'Ubuntu'
+          - ansible_facts['distribution_release'] == 'noble'
+        fail_msg: >-
+          This playbook targets Ubuntu 24.04 (noble) only. Detected
+          {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
+          ({{ ansible_facts['distribution_release'] }}). Please upgrade the OS or
+          use the 22.04 playbook.
+
+  tasks:
+    - name: Install base packages
+      apt:
+        name:
+          - curl
+          - gnupg
+          - ca-certificates
+          - lsb-release
+          - apt-transport-https
+        update_cache: true
+        state: present
+
+    - name: Ensure keyrings directory exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Install MongoDB 8.0 keyring (dearmor asc)
+      shell: |
+        set -euo pipefail
+        curl -fsSL https://pgp.mongodb.com/server-8.0.asc | \
+          gpg --dearmor -o /etc/apt/keyrings/mongodb-server-8.0.gpg
+        chmod 0644 /etc/apt/keyrings/mongodb-server-8.0.gpg
+      args:
+        creates: /etc/apt/keyrings/mongodb-server-8.0.gpg
+
+    - name: Add MongoDB 8.0 apt repository
+      copy:
+        dest: /etc/apt/sources.list.d/mongodb-org-8.0.list
+        mode: '0644'
+        content: |
+          deb [ signed-by=/etc/apt/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse
+
+    - name: Import Pritunl repo key from keyserver into keyring
+      shell: |
+        set -euo pipefail
+        TMP=$(mktemp -d)
+        GNUPGHOME="$TMP"; export GNUPGHOME
+        gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 7AE645C0CF8E292A
+        gpg --armor --export 7AE645C0CF8E292A | gpg --dearmor -o /etc/apt/keyrings/pritunl.gpg
+        chmod 0644 /etc/apt/keyrings/pritunl.gpg
+        rm -rf "$TMP"
+      args:
+        creates: /etc/apt/keyrings/pritunl.gpg
+
+    - name: Add Pritunl apt repository (noble)
+      copy:
+        dest: /etc/apt/sources.list.d/pritunl.list
+        mode: '0644'
+        content: |
+          deb [signed-by=/etc/apt/keyrings/pritunl.gpg] https://repo.pritunl.com/stable/apt noble main
+
+    - name: Update apt cache
+      apt:
+        update_cache: true
+
+    - name: Install MongoDB, Pritunl, OpenVPN and WireGuard
+      apt:
+        name:
+          - mongodb-org
+          - pritunl
+          - openvpn
+          - wireguard
+          - wireguard-tools
+        state: present
+
+    - name: Enable and start MongoDB
+      systemd:
+        name: mongod
+        enabled: true
+        state: started
+
+    - name: Enable and start Pritunl
+      systemd:
+        name: pritunl
+        enabled: true
+        state: started
+
+    - name: Gather Pritunl setup key
+      command: pritunl setup-key
+      register: pritunl_setup_key
+      changed_when: false
+
+    - name: Output setup details
+      debug:
+        msg: "Pritunl setup key: {{ pritunl_setup_key.stdout | default('') }}"
+
+    - name: Optional UFW rules (skip if UFW absent)
+      block:
+        - name: Allow SSH
+          ufw:
+            rule: allow
+            name: OpenSSH
+        - name: Allow HTTP/HTTPS and OpenVPN UDP 1194
+          ufw:
+            rule: allow
+            port: "{{ item.port }}"
+            proto: "{{ item.proto }}"
+          loop:
+            - { port: '80',  proto: 'tcp' }
+            - { port: '443', proto: 'tcp' }
+            - { port: '1194', proto: 'udp' }
+      rescue:
+        - debug:
+            msg: "UFW not configured or not present; skipping firewall configuration."
+

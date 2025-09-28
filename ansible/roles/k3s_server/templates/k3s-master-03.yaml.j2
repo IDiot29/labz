@@ -1,0 +1,44 @@
+token: "{{ k3s_token }}"
+node-name: 'k3s-master-03'
+node-ip: '10.10.0.7'
+#cluster-init: true
+server: 'https://10.10.0.26:6443'
+tls-san:
+  - '10.10.0.26'
+  - '10.10.0.133'
+  - '10.10.0.7'
+  - '127.0.0.1'
+cluster-cidr: '10.42.0.0/16'
+service-cidr: '10.43.0.0/16'
+flannel-backend: 'none'
+disable-network-policy: true
+# Disable kube-proxy to use Cilium
+disable-kube-proxy: true
+# valid items: coredns, servicelb, traefik, local-storage, metrics-server
+disable:
+  - 'traefik'
+  - 'servicelb'
+  - 'local-storage'
+#  - 'metrics-server'
+## `node-role.kubernetes.io disabled via config.yaml due to k3s behaviour
+## https://github.com/k3s-io/k3s/issues/1289
+#node-label:
+#  - 'kube-ovn/role=master'
+node-taint:
+  - 'node-role.kubernetes.io/master=true:NoSchedule'
+kube-controller-manager-arg:
+  - bind-address=0.0.0.0
+kube-scheduler-arg:
+  - bind-address=0.0.0.0
+kube-proxy-arg:
+  - metrics-bind-address=0.0.0.0
+kubelet-arg:
+  - 'eviction-max-pod-grace-period=60'
+  - 'kube-reserved=cpu=200m,memory=512Mi,ephemeral-storage=1Gi'
+  - 'system-reserved=cpu=200m,memory=512Mi,ephemeral-storage=1Gi'
+  - 'eviction-hard=memory.available<200Mi,nodefs.available<10%,nodefs.inodesFree<5%'
+  - 'eviction-soft=memory.available<500Mi,nodefs.available<10%,nodefs.inodesFree<10%'
+  - 'eviction-soft-grace-period=memory.available=1m,nodefs.available=1m,nodefs.inodesFree=1m'
+etcd-snapshot-name: etcd-snapshot-obs-tbs
+etcd-snapshot-schedule-cron: '0 */12 * * *'
+etcd-snapshot-retention: 60

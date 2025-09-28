@@ -1,0 +1,20 @@
+---
+- name: Ensure rancher config directory exists
+  ansible.builtin.file:
+    path: /etc/rancher/k3s
+    state: directory
+    mode: '0755'
+
+- name: Download k3s binary if not present or version mismatch
+  ansible.builtin.get_url:
+    url: "https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}/k3s"
+    dest: "{{ k3s_binary_path }}"
+    mode: '0755'
+  register: k3s_bin
+
+- name: Download installer script
+  ansible.builtin.get_url:
+    url: "{{ k3s_install_script_url }}"
+    dest: "{{ k3s_install_script_path }}"
+    mode: '0755'
+
