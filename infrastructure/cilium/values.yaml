@@ -11,8 +11,3 @@ routingMode: tunnel
 tunnelProtocol: vxlan
 operator:
   replicas: 1
-l2announcements:
-  enabled: true
-l2NeighDiscovery:
-  enabled: true
-ipv4NativeRoutingCIDR: 10.10.0.0/24

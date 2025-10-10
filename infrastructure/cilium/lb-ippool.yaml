@@ -1,0 +1,28 @@
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "default-pool"
+spec:
+  blocks:
+    - cidr: "10.10.0.200/31"
+  serviceSelector:
+    matchLabels:
+      ip-pool: default-pool
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: "default-l2-announcement-policy"
+  namespace: kube-system
+spec:
+  serviceSelector:
+    matchLabels:
+      ip-pool: default-pool
+  nodeSelector:
+    matchLabels: {}
+  interfaces:
+    - "^ens.*"
+    - "^eth.*"
+  externalIPs: true
+  loadBalancerIPs: true
