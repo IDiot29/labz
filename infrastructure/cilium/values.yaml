@@ -16,10 +16,3 @@ l2announcements:
 l2NeighDiscovery:
   enabled: true
 ipv4NativeRoutingCIDR: 10.10.0.0/24
-loadBalancer:
-  l7:
-    backend: disabled
-bgpControlPlane:
-  enabled: false
-# Disable Cilium LB IPAM to use MetalLB instead
-enableIPAM: false
