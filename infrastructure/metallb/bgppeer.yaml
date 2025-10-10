@@ -1,0 +1,14 @@
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: bgp-peer
+  namespace: metallb-system
+spec:
+  # BGP router address
+  peerAddress: 10.10.0.242
+
+  # BGP router ASN (Autonomous System Number)
+  peerASN: 64500
+
+  # MetalLB ASN
+  myASN: 64501

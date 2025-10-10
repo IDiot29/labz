@@ -1,0 +1,10 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: inf-monitoring-pool
+  namespace: metallb-system
+spec:
+  # IP range for LoadBalancer services
+  addresses:
+    - 10.10.0.250-10.10.0.254
+  autoAssign: true

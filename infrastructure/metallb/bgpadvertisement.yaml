@@ -1,0 +1,9 @@
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: bgp-advertisement
+  namespace: metallb-system
+spec:
+  # Leave empty to advertise all pools, or specify pool names
+  ipAddressPools:
+    - inf-monitoring-pool  # Matches the IPAddressPool name
