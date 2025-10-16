@@ -4,9 +4,9 @@ namespace: metallb-system
 resources:
   - namespace.yaml
   - release.yaml
-  # - ipaddresspool.yaml
-  # - bgppeer.yaml
-  # - bgpadvertisement.yaml
+  - ipaddresspool.yaml
+  - bgppeer.yaml
+  - bgpadvertisement.yaml
   # - nginx-deployment.yaml
   # - nginx-service.yaml
 generatorOptions:
