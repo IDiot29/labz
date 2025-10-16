@@ -1,3 +1,4 @@
+logLevel: debug
 speaker:
   frr:
-    enabled: false
+    enabled: true
